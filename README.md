@@ -119,7 +119,7 @@ Requires Go 1.26+.
 
 ## Docs
 
-[Specification](docs/SPEC.md) · [Rules and noise budget](docs/RULES.md) · [CI](docs/CI.md) · [Release and verification](docs/RELEASE.md)
+[Specification](docs/SPEC.md) · [Rules and noise budget](docs/RULES.md) · [Glossary](docs/GLOSSARY.md) · [CI](docs/CI.md) · [Release and verification](docs/RELEASE.md)
 
 ## About this project
 

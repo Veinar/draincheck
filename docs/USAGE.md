@@ -43,7 +43,7 @@ Each finding has exactly one severity. There is no `SAFE`.
 | `RISK`    | The drain proceeds, possibly in steps or after waiting, but something is lost, degraded or delayed. |
 | `UNKNOWN` | The outcome cannot be established reliably.                          |
 
-`kubectl drain` retries a refused eviction until its timeout, which is why the definitions rest on whether waiting can fix the problem. [SPEC.md](SPEC.md#31-what-blocked-and-risk-mean-for-a-drain-that-retries) has the reasoning and worked examples.
+`kubectl drain` retries a refused eviction until its timeout, which is why the definitions rest on whether waiting can fix the problem. [SPEC.md](SPEC.md#31-what-blocked-and-risk-mean-for-a-drain-that-retries) has the reasoning and worked examples. Kubernetes and draincheck terms used in this document are defined in the [glossary](GLOSSARY.md).
 
 Findings are sorted by namespace, kind and name.
 
@@ -405,3 +405,4 @@ When the exit code decides whether a pipeline passes, treat `141` as a failed ru
 ## See also
 
 - [Specification](SPEC.md)
+- [Glossary](GLOSSARY.md)
