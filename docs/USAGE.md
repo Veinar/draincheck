@@ -146,6 +146,10 @@ This report describes the observed cluster state at 2026-10-14T09:30:00Z and doe
 - `generated_at` is the time the cluster snapshot was taken (RFC 3339, UTC), not the time the document was written, so the same snapshot always gives the same bytes.
 - `disclaimer` is the mandatory statement that the report does not guarantee execution success. It names the same timestamp.
 
+## JSON recipes
+
+For ready-to-use `jq` queries and their exact output against the v1 golden report, see [JSON report recipes](RECIPES.md).
+
 ## Rules
 
 Rules are implemented in `internal/analyzer` and all of them run on every invocation. How each rule keeps its noise down (false-positive cases, downgrades, grouping) is recorded in [RULES.md](RULES.md).
