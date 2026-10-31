@@ -4,6 +4,7 @@ package analyzer
 func DefaultRules() []Rule {
 	return []Rule{
 		PDBDisruptionBlocked{},
+		PDBUnsatisfiable{},
 		PDBOverlappingSelectors{},
 		PDBBatchExceedsBudget{},
 		PDBStaleStatus{},

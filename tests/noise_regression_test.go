@@ -79,6 +79,8 @@ func podsCovered(e findings.Evidence) int {
 		return len(ev.Pods)
 	case findings.PDBEvidence:
 		return len(ev.Pods)
+	case findings.PDBUnsatisfiableEvidence:
+		return len(ev.Pods)
 	case findings.PDBStaleStatusEvidence:
 		return len(ev.Pods)
 	case findings.PDBBatchEvidence:
@@ -124,7 +126,7 @@ func TestNoiseRegression(t *testing.T) {
 		{"MISSING_RESOURCE_REQUESTS", findings.Risk, "Deployment", "shop", "worker", 8},
 		{"PDB_OVERLAPPING_SELECTORS", findings.Blocked, "Pod", "shop", "cache-0", -1},
 		{"PDB_BATCH_EXCEEDS_BUDGET", findings.Risk, "PodDisruptionBudget", "shop", "api-pdb", 10},
-		{"PDB_DISRUPTION_BLOCKED", findings.Blocked, "PodDisruptionBudget", "shop", "db-pdb", 3},
+		{"PDB_UNSATISFIABLE", findings.Blocked, "PodDisruptionBudget", "shop", "db-pdb", 3},
 		{"PDB_STALE_STATUS", findings.Unknown, "PodDisruptionBudget", "shop", "queue-pdb", 2},
 		{"PDB_BATCH_EXCEEDS_BUDGET", findings.Risk, "PodDisruptionBudget", "shop", "web-pdb", 12},
 	}

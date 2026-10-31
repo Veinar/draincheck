@@ -75,6 +75,7 @@ A finding covers one cause, not one pod. A cause that reaches many pods, such as
 | --- | --- | --- |
 | `PDB_DISRUPTION_BLOCKED` (`BLOCKED`) | PodDisruptionBudget | the PodDisruptionBudget |
 | `PDB_DISRUPTION_BLOCKED` (`UNKNOWN`) | operator and namespace | the namespace |
+| `PDB_UNSATISFIABLE` | PodDisruptionBudget | the PodDisruptionBudget |
 | `PDB_BATCH_EXCEEDS_BUDGET` | PodDisruptionBudget | the PodDisruptionBudget |
 | `PDB_STALE_STATUS` | PodDisruptionBudget | the PodDisruptionBudget |
 | `PDB_SYNC_FAILED` | PodDisruptionBudget | the PodDisruptionBudget |
@@ -198,6 +199,7 @@ Raised for a PodDisruptionBudget with `status.disruptionsAllowed == 0` that sele
 - A PDB whose selector is invalid is skipped.
 - A PDB that selects a pod together with another PDB is not reported here: `PDB_OVERLAPPING_SELECTORS` reports the pod, and the numbers of the budgets can be out of date.
 - A PDB whose status is stale is not reported here: `PDB_STALE_STATUS` reports it as `UNKNOWN`, because its numbers cannot be trusted.
+- A PDB that can never allow a disruption (`desiredHealthy` not below `expectedPods`) is not reported here: `PDB_UNSATISFIABLE` reports it. This rule keeps the budgets at 0 that may clear by themselves.
 - A budget that allows some disruptions but fewer than the batch causes is `PDB_BATCH_EXCEEDS_BUDGET`, not reported here.
 
 **Budgets managed by an operator.** A budget that selects a pod controlled by a custom resource is `UNKNOWN`, not `BLOCKED`. A pod is controlled by a custom resource when the API group of its controller is not the core group, `apps` or `batch`. An operator can create and remove such a budget itself, so whether the drain stalls depends on operator state draincheck cannot see. Pods controlled by a Deployment, StatefulSet, Job or ReplicationController keep their budget `BLOCKED`; a budget over pods of both kinds is `UNKNOWN`. Only selected pods on the target nodes count, so an operator pod on another node does not change the answer.
@@ -220,6 +222,19 @@ Raised for a pod on a target node when more than one PodDisruptionBudget in the 
 - Only pods scheduled on a target node count. Pods in phase `Succeeded`, `Failed` or `Pending` and pods that are already terminating are skipped, since eviction does not consult budgets for them. So are DaemonSet-managed pods and static (mirror) pods, which `kubectl drain` never evicts. They stay visible through `POD_OWNERSHIP`.
 - An empty selector (`{}`) selects every pod in its namespace, so it overlaps with any other budget there; one with no selector selects none.
 - A PDB whose selector is invalid is skipped.
+
+### `PDB_UNSATISFIABLE`
+
+Severity: `BLOCKED`.
+
+Raised for a PodDisruptionBudget that can never allow a disruption while it selects pods on the target nodes: `status.desiredHealthy` is not below `status.expectedPods`, which is `minAvailable` at or above the replica count, or `maxUnavailable: 0`. However healthy the workload is, the eviction API refuses the pods, and `kubectl drain` retries a refused eviction until `--timeout` (infinite by default), so it waits and never completes. Only a change to the budget or to the replica count clears it, which is the difference from `PDB_DISRUPTION_BLOCKED`, where waiting or fixing a pod can.
+
+- **Resource:** the PDB, one finding per PDB.
+- **Description:** the numbers (needed healthy, expected pods), why (`minAvailable`, or `maxUnavailable: 0`, which is often deliberate and said to be), and how many pods on how many target nodes are affected.
+- **Evidence:** `namespace`, `name`, `expected_pods`, `desired_healthy`, `min_available` and `max_unavailable` as configured (the unset one is omitted), `nodes` and `pods` (each with `namespace`, `name` and `node`).
+- A budget is reported by exactly one of `PDB_UNSATISFIABLE` and `PDB_DISRUPTION_BLOCKED`. The rule ID a budget reports changes from `PDB_DISRUPTION_BLOCKED` to this one when it can never allow a disruption.
+- Pods are selected as for `PDB_DISRUPTION_BLOCKED`; with `--disable-eviction` nothing is reported. A stale, failed, operator-managed, overlapping or unknown-policy budget is left to the rule that reports that state.
+- Needs no access beyond `PDB_DISRUPTION_BLOCKED` (see *Cluster access*).
 
 ### `PDB_BATCH_EXCEEDS_BUDGET`
 
