@@ -12,7 +12,7 @@
 # shop/web        Deployment, 12 pods, no requests. web-pdb allows 1: one RISK finding (12 pods).
 # shop/api        Deployment, 10 pods, no requests. api-pdb allows 1: one RISK finding (10 pods).
 # shop/worker     Deployment, 8 pods, memory request missing on one container.
-# shop/db         StatefulSet, 3 pods with requests. db-pdb allows 0: BLOCKED.
+# shop/db         StatefulSet, 3 pods with requests. db-pdb (minAvailable 3 of 3) can never allow a disruption: BLOCKED, PDB_UNSATISFIABLE.
 # shop/cache      one pod selected by two budgets (cache-by-app, cache-by-tier).
 # shop/queue      Deployment, 2 pods. queue-pdb allows 0 but its status is stale.
 # default/debug-shell  a pod with no controller and no requests.

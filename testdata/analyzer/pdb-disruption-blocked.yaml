@@ -15,6 +15,10 @@
 # namespaced. batch/job-0 is covered by an empty selector that allows 0.
 # monitoring/agent-pdb allows 0 but only selects a DaemonSet pod, so there is
 # no finding at all.
+#
+# Budgets at 0 here have expectedPods one above desiredHealthy (a pod that is not
+# counted healthy), so they are state-dependent and stay with PDB_DISRUPTION_BLOCKED;
+# the ones that can never allow a disruption are in pdb-unsatisfiable.yaml.
 apiVersion: v1
 kind: Node
 metadata:
@@ -220,7 +224,7 @@ status:
   currentHealthy: 3
   desiredHealthy: 3
   disruptionsAllowed: 0
-  expectedPods: 3
+  expectedPods: 4
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -252,7 +256,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -268,7 +272,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -286,7 +290,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -299,7 +303,7 @@ status:
   currentHealthy: 0
   desiredHealthy: 0
   disruptionsAllowed: 0
-  expectedPods: 0
+  expectedPods: 1
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -313,7 +317,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -329,4 +333,4 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2

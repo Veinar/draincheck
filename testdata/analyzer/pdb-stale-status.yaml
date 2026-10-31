@@ -10,6 +10,10 @@
 # monitoring/agent-pdb is stale but selects only a DaemonSet pod, which kubectl
 # never evicts, so there is no finding. edge/proxy-pdb is stale but its only
 # pod runs on worker-03; it matters only when worker-03 is a target.
+#
+# Budgets at 0 here have expectedPods one above desiredHealthy (a pod that is not
+# counted healthy), so they are state-dependent and stay with PDB_DISRUPTION_BLOCKED;
+# the ones that can never allow a disruption are in pdb-unsatisfiable.yaml.
 apiVersion: v1
 kind: Node
 metadata:
@@ -138,7 +142,7 @@ status:
   currentHealthy: 2
   desiredHealthy: 2
   disruptionsAllowed: 0
-  expectedPods: 2
+  expectedPods: 3
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -192,7 +196,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -210,7 +214,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -228,4 +232,4 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2

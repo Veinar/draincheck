@@ -1,0 +1,484 @@
+# Cluster for PDB_UNSATISFIABLE, and for its split from PDB_DISRUPTION_BLOCKED.
+#
+# A budget is unsatisfiable when status.desiredHealthy >= status.expectedPods:
+# minAvailable at or above the replica count, or maxUnavailable 0. It can never
+# allow a disruption, however healthy the workload is. All pods are Ready unless
+# the comment says otherwise. Nodes: worker-01, worker-02.
+#
+#   a/min-eq        minAvailable 2, 2 pods on worker-01          -> PDB_UNSATISFIABLE
+#   b/max-zero      maxUnavailable 0, pods on worker-01 and 02   -> PDB_UNSATISFIABLE (maybe deliberate)
+#   c/min-above     minAvailable 5 for 2 pods                    -> PDB_UNSATISFIABLE
+#   i/pct           maxUnavailable "0%"                          -> PDB_UNSATISFIABLE
+#   d/transient     minAvailable 1, 2 pods, one NOT Ready: 0 allowed now, clears when it is Ready
+#                                                                -> PDB_DISRUPTION_BLOCKED only
+#   e/stale         unsatisfiable numbers but a stale status     -> PDB_STALE_STATUS only
+#   f/operator      unsatisfiable numbers, pod owned by an operator CR
+#                                                                -> PDB_DISRUPTION_BLOCKED (UNKNOWN) only
+#   g/odd-policy    unsatisfiable numbers, unknown unhealthyPodEvictionPolicy
+#                                                                -> PDB_DISRUPTION_BLOCKED (UNKNOWN) only
+#   h/ds            unsatisfiable numbers, selects a DaemonSet pod only -> nothing (kubectl skips it)
+#   j/ok            minAvailable 1 of 3, 2 allowed               -> nothing
+apiVersion: v1
+kind: Node
+metadata:
+  name: worker-01
+
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: worker-02
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-0
+  namespace: a
+  labels:
+    app: a
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-1
+  namespace: a
+  labels:
+    app: a
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: min-eq
+  namespace: a
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: a
+status:
+  expectedPods: 2
+  desiredHealthy: 2
+  currentHealthy: 2
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: b-0
+  namespace: b
+  labels:
+    app: b
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: b-1
+  namespace: b
+  labels:
+    app: b
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: b-2
+  namespace: b
+  labels:
+    app: b
+spec:
+  nodeName: worker-02
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: max-zero
+  namespace: b
+spec:
+  maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: b
+status:
+  expectedPods: 3
+  desiredHealthy: 3
+  currentHealthy: 3
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: c-0
+  namespace: c
+  labels:
+    app: c
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: c-1
+  namespace: c
+  labels:
+    app: c
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: min-above
+  namespace: c
+spec:
+  minAvailable: 5
+  selector:
+    matchLabels:
+      app: c
+status:
+  expectedPods: 2
+  desiredHealthy: 5
+  currentHealthy: 2
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: i-0
+  namespace: i
+  labels:
+    app: i
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: i-1
+  namespace: i
+  labels:
+    app: i
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pct
+  namespace: i
+spec:
+  maxUnavailable: "0%"
+  selector:
+    matchLabels:
+      app: i
+status:
+  expectedPods: 2
+  desiredHealthy: 2
+  currentHealthy: 2
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: d-0
+  namespace: d
+  labels:
+    app: d
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: d-1
+  namespace: d
+  labels:
+    app: d
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+status:
+  phase: Running
+  conditions:
+    - type: Ready
+      status: "False"
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: transient
+  namespace: d
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: d
+status:
+  expectedPods: 2
+  desiredHealthy: 1
+  currentHealthy: 1
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: e-0
+  namespace: e
+  labels:
+    app: e
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: e-1
+  namespace: e
+  labels:
+    app: e
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: stale
+  namespace: e
+  generation: 2
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: e
+status:
+  expectedPods: 2
+  desiredHealthy: 2
+  currentHealthy: 2
+  disruptionsAllowed: 0
+  observedGeneration: 1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: f-0
+  namespace: f
+  labels:
+    app: f
+  ownerReferences:
+    - apiVersion: storage.example.com/v1
+      kind: NodeAgent
+      name: agent
+      controller: true
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: operator
+  namespace: f
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: f
+status:
+  expectedPods: 1
+  desiredHealthy: 1
+  currentHealthy: 1
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: g-0
+  namespace: g
+  labels:
+    app: g
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: odd-policy
+  namespace: g
+spec:
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: SometimesAllow
+  selector:
+    matchLabels:
+      app: g
+status:
+  expectedPods: 1
+  desiredHealthy: 1
+  currentHealthy: 1
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: h-0
+  namespace: h
+  labels:
+    app: h
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      name: ds
+      controller: true
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ds
+  namespace: h
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: h
+status:
+  expectedPods: 1
+  desiredHealthy: 1
+  currentHealthy: 1
+  disruptionsAllowed: 0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: j-0
+  namespace: j
+  labels:
+    app: j
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: j-1
+  namespace: j
+  labels:
+    app: j
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: j-2
+  namespace: j
+  labels:
+    app: j
+spec:
+  nodeName: worker-01
+  containers:
+    - name: c
+      image: example/c:1
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ok
+  namespace: j
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: j
+status:
+  expectedPods: 3
+  desiredHealthy: 1
+  currentHealthy: 3
+  disruptionsAllowed: 2

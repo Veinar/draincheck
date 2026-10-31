@@ -23,6 +23,10 @@
 #   Deployment pod is evicted when worker-01 alone is.
 # outdated: an operator PDB whose status is stale: PDB_STALE_STATUS reports it,
 #   not this rule.
+#
+# Budgets at 0 here have expectedPods one above desiredHealthy (a pod that is not
+# counted healthy), so they are state-dependent and stay with PDB_DISRUPTION_BLOCKED;
+# the ones that can never allow a disruption are in pdb-unsatisfiable.yaml.
 apiVersion: v1
 kind: Node
 metadata:
@@ -398,7 +402,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -414,7 +418,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -430,7 +434,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -446,7 +450,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -478,7 +482,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -494,7 +498,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -510,7 +514,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -526,7 +530,7 @@ status:
   currentHealthy: 2
   desiredHealthy: 2
   disruptionsAllowed: 0
-  expectedPods: 2
+  expectedPods: 3
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -542,7 +546,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -558,7 +562,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -574,7 +578,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -590,7 +594,7 @@ status:
   currentHealthy: 2
   desiredHealthy: 2
   disruptionsAllowed: 0
-  expectedPods: 2
+  expectedPods: 3
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -608,7 +612,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: v1
 kind: Pod
@@ -700,7 +704,7 @@ status:
   currentHealthy: 1
   desiredHealthy: 1
   disruptionsAllowed: 0
-  expectedPods: 1
+  expectedPods: 2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -716,4 +720,4 @@ status:
   currentHealthy: 2
   desiredHealthy: 2
   disruptionsAllowed: 0
-  expectedPods: 2
+  expectedPods: 3

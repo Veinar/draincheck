@@ -40,6 +40,10 @@ const PDBDisruptionBlockedID = "PDB_DISRUPTION_BLOCKED"
 // So is a budget whose disruption controller failed to compute it (see
 // PDBSyncFailed): the 0 it records is not a real budget.
 //
+// A budget that can never allow a disruption (see unsatisfiableBudget) is
+// skipped: PDBUnsatisfiable reports it, so no budget is reported twice. This
+// rule keeps the budgets at 0 that may clear by themselves.
+//
 // A budget that selects a pod controlled by a custom resource (an operator, see
 // operatorOwned) is not BLOCKED but UNKNOWN: whether the drain stops depends on
 // operator state draincheck cannot see. Those budgets are grouped per operator
@@ -61,6 +65,9 @@ func (PDBDisruptionBlocked) Evaluate(in Input) []findings.Finding {
 		}
 		if _, failed := pdbSyncFailure(pdb); failed {
 			continue
+		}
+		if unsatisfiableBudget(sel) {
+			continue // reported once, by PDB_UNSATISFIABLE
 		}
 		if !sel.policyKnown {
 			out = append(out, unknownPolicyFinding(sel))

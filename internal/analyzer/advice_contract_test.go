@@ -31,6 +31,7 @@ var workers123 = []string{"worker-01", "worker-02", "worker-03"}
 
 var adviceCases = []adviceCase{
 	{"PDB_DISRUPTION_BLOCKED", "pdb-disruption-blocked.yaml", workers123, DrainOptions{}},
+	{"PDB_UNSATISFIABLE", "pdb-unsatisfiable.yaml", []string{"worker-01", "worker-02"}, DrainOptions{}},
 	// A budget policy draincheck does not know gives the UNKNOWN finding.
 	{"PDB_DISRUPTION_BLOCKED", "pdb-unhealthy-pods.yaml", workers123, DrainOptions{}},
 	// Operator-managed budgets give the UNKNOWN finding per operator.
@@ -146,6 +147,7 @@ var adviceVariants = []string{
 	"PDB_DISRUPTION_BLOCKED/BLOCKED/findings.PDBEvidence",
 	"PDB_DISRUPTION_BLOCKED/UNKNOWN/findings.PDBEvidence",
 	"PDB_DISRUPTION_BLOCKED/UNKNOWN/findings.OperatorManagedPDBsEvidence",
+	"PDB_UNSATISFIABLE/BLOCKED/findings.PDBUnsatisfiableEvidence",
 	"PDB_OVERLAPPING_SELECTORS/BLOCKED/findings.OverlappingPDBsEvidence",
 	"PDB_BATCH_EXCEEDS_BUDGET/RISK/findings.PDBBatchEvidence",
 	"PDB_STALE_STATUS/UNKNOWN/findings.PDBStaleStatusEvidence",
