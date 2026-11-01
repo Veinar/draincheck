@@ -1,0 +1,65 @@
+# krew plugin manifest for `kubectl drain-check`. Spec: https://krew.sigs.k8s.io/docs/developer-guide/plugin-manifest/
+# The sha256 values are placeholders until the release below exists; docs/KREW.md has the steps.
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: drain-check
+spec:
+  version: v0.2.0
+  homepage: https://github.com/Veinar/draincheck
+  shortDescription: Preflight check for a multi-node drain
+  description: |
+    Read-only check that runs before you drain several nodes. It reads the
+    cluster, assesses all target nodes together and reports what would block
+    or put the drain at risk (PodDisruptionBudgets shared across nodes, pods
+    that cannot be evicted, workloads left without a replica, no room to
+    reschedule). It never cordons, evicts, patches or deletes anything.
+  platforms:
+    - selector:
+        matchLabels: {os: linux, arch: amd64}
+      uri: https://github.com/Veinar/draincheck/releases/download/v0.2.0/draincheck_0.2.0_linux_amd64.tar.gz
+      sha256: REPLACE_WITH_SHA256_LINUX_AMD64
+      bin: kubectl-drain_check
+      files:
+        - {from: kubectl-drain_check, to: .}
+        - {from: LICENSE, to: .}
+    - selector:
+        matchLabels: {os: linux, arch: arm64}
+      uri: https://github.com/Veinar/draincheck/releases/download/v0.2.0/draincheck_0.2.0_linux_arm64.tar.gz
+      sha256: REPLACE_WITH_SHA256_LINUX_ARM64
+      bin: kubectl-drain_check
+      files:
+        - {from: kubectl-drain_check, to: .}
+        - {from: LICENSE, to: .}
+    - selector:
+        matchLabels: {os: darwin, arch: amd64}
+      uri: https://github.com/Veinar/draincheck/releases/download/v0.2.0/draincheck_0.2.0_darwin_amd64.tar.gz
+      sha256: REPLACE_WITH_SHA256_DARWIN_AMD64
+      bin: kubectl-drain_check
+      files:
+        - {from: kubectl-drain_check, to: .}
+        - {from: LICENSE, to: .}
+    - selector:
+        matchLabels: {os: darwin, arch: arm64}
+      uri: https://github.com/Veinar/draincheck/releases/download/v0.2.0/draincheck_0.2.0_darwin_arm64.tar.gz
+      sha256: REPLACE_WITH_SHA256_DARWIN_ARM64
+      bin: kubectl-drain_check
+      files:
+        - {from: kubectl-drain_check, to: .}
+        - {from: LICENSE, to: .}
+    - selector:
+        matchLabels: {os: windows, arch: amd64}
+      uri: https://github.com/Veinar/draincheck/releases/download/v0.2.0/draincheck_0.2.0_windows_amd64.zip
+      sha256: REPLACE_WITH_SHA256_WINDOWS_AMD64
+      bin: kubectl-drain_check.exe
+      files:
+        - {from: kubectl-drain_check.exe, to: .}
+        - {from: LICENSE, to: .}
+    - selector:
+        matchLabels: {os: windows, arch: arm64}
+      uri: https://github.com/Veinar/draincheck/releases/download/v0.2.0/draincheck_0.2.0_windows_arm64.zip
+      sha256: REPLACE_WITH_SHA256_WINDOWS_ARM64
+      bin: kubectl-drain_check.exe
+      files:
+        - {from: kubectl-drain_check.exe, to: .}
+        - {from: LICENSE, to: .}

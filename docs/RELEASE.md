@@ -6,8 +6,8 @@ Releases are built by `.github/workflows/release.yml` when a `vX.Y.Z` tag is pus
 
 | File                                         | What                                                        |
 | -------------------------------------------- | ----------------------------------------------------------- |
-| `draincheck_<version>_<os>_<arch>.tar.gz`    | Linux and macOS: binary, `LICENSE`, `README.md`             |
-| `draincheck_<version>_windows_<arch>.zip`    | Windows: `draincheck.exe`, `LICENSE`, `README.md`           |
+| `draincheck_<version>_<os>_<arch>.tar.gz`    | Linux and macOS: `draincheck`, `kubectl-drain_check` (the same program, for [krew](KREW.md)), `LICENSE`, `README.md` |
+| `draincheck_<version>_windows_<arch>.zip`    | Windows: `draincheck.exe`, `kubectl-drain_check.exe`, `LICENSE`, `README.md` |
 | `checksums.txt`                              | SHA-256 of every archive                                    |
 | `checksums.txt.sigstore.json`                | cosign keyless signature bundle for `checksums.txt`         |
 | `draincheck.intoto.jsonl`                    | SLSA provenance for every archive (slsa-github-generator)   |
@@ -68,6 +68,7 @@ Download the archive, `checksums.txt`, `checksums.txt.sigstore.json` and `drainc
 1. Move the `[Unreleased]` entries of `CHANGELOG.md` under `## [X.Y.Z] - <date>` and merge to `develop`, then tag a signed tag: `git tag -s vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`. Keep a `### Stability` block in the new section (what is meant to hold, what can still change): `docs/USAGE.md` sends readers to the latest release section for it.
 2. Watch the `Release` workflow. All three jobs must pass.
 3. Run the verification steps above against the published assets.
+4. Update `plugins/drain-check.yaml` with the new tag and the hashes from `checksums.txt` ([KREW.md](KREW.md)).
 
 The workflow creates the release as a draft, attaches the SLSA provenance to it and only then publishes it. This is required when release immutability is enabled for the repository: assets cannot be added to a published release, and the tag name of a published release cannot be reused. If the run fails before the last job, the release stays a draft. Delete it (`gh release delete vX.Y.Z --yes`), delete the tag, fix the cause and tag again. Nothing has been published.
 
