@@ -76,7 +76,7 @@ The exit code is `0` here because no finding reaches the default `--fail-on bloc
 
 ## Install
 
-Linux, macOS and Windows binaries (`amd64` and `arm64`) are on the [releases page](https://github.com/Veinar/draincheck/releases). Releases are signed with cosign (keyless) and ship SLSA provenance. Install and verification steps: [docs/RELEASE.md](docs/RELEASE.md).
+Linux, macOS and Windows binaries (`amd64` and `arm64`) are on the [releases page](https://github.com/Veinar/draincheck/releases). Releases are signed with cosign (keyless) and ship SLSA provenance. Install and verification steps: [docs/RELEASE.md](docs/RELEASE.md). The krew plugin manifest (`kubectl drain-check`) is in the repository but not listed in the krew index yet (*planned*): [docs/KREW.md](docs/KREW.md).
 
 ## Usage
 

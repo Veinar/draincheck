@@ -27,8 +27,31 @@ builds:
       - -s -w -X main.version={{ .Version }}
     mod_timestamp: "{{ .CommitTimestamp }}"
 
+  # Same program under the name krew and kubectl need (`kubectl drain-check` runs
+  # kubectl-drain_check from PATH). plugins/drain-check.yaml points at this binary.
+  - id: kubectl-drain_check
+    main: ./cmd/draincheck
+    binary: kubectl-drain_check
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
 archives:
   - id: draincheck
+    ids:
+      - draincheck
+      - kubectl-drain_check
     formats:
       - tar.gz
     format_overrides:
